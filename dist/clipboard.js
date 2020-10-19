@@ -3,6 +3,9 @@
  * https://clipboardjs.com/
  * 
  * Licensed MIT © Zeno Rocha
+ * 
+ * This version refactored by Kiran Castellino
+ * See more: https://github.com/kcastellino/clipboard.js
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -778,12 +781,14 @@ var tiny_emitter_default = /*#__PURE__*/__webpack_require__.n(tiny_emitter);
 var listen = __webpack_require__(2);
 var listen_default = /*#__PURE__*/__webpack_require__.n(listen);
 
-// CONCATENATED MODULE: ./src/clipboard.js
-var clipboard_typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+// CONCATENATED MODULE: ./src/clipboard-handlers.js
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var clipboard_createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var clipboard_handlers_typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function clipboard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var clipboard_handlers_createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function clipboard_handlers_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
@@ -794,24 +799,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 /**
- * Base class which takes one or more elements, adds event listeners to them,
- * and instantiates a new `ClipboardAction` on each click.
+ * Base class which provides functions to instantiate a new `ClipboardAction` on each click.
  */
 
-var clipboard_Clipboard = function (_Emitter) {
-    _inherits(Clipboard, _Emitter);
+var clipboard_handlers_Clip = function (_Emitter) {
+    _inherits(Clip, _Emitter);
 
     /**
      * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
      * @param {Object} options
      */
-    function Clipboard(trigger, options) {
-        clipboard_classCallCheck(this, Clipboard);
+    function Clip(options) {
+        clipboard_handlers_classCallCheck(this, Clip);
 
-        var _this = _possibleConstructorReturn(this, (Clipboard.__proto__ || Object.getPrototypeOf(Clipboard)).call(this));
+        var _this = _possibleConstructorReturn(this, (Clip.__proto__ || Object.getPrototypeOf(Clip)).call(this));
 
         _this.resolveOptions(options);
-        _this.listenClick(trigger);
         return _this;
     }
 
@@ -822,7 +825,7 @@ var clipboard_Clipboard = function (_Emitter) {
      */
 
 
-    clipboard_createClass(Clipboard, [{
+    clipboard_handlers_createClass(Clip, [{
         key: 'resolveOptions',
         value: function resolveOptions() {
             var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -830,22 +833,7 @@ var clipboard_Clipboard = function (_Emitter) {
             this.action = typeof options.action === 'function' ? options.action : this.defaultAction;
             this.target = typeof options.target === 'function' ? options.target : this.defaultTarget;
             this.text = typeof options.text === 'function' ? options.text : this.defaultText;
-            this.container = clipboard_typeof(options.container) === 'object' ? options.container : document.body;
-        }
-
-        /**
-         * Adds a click event listener to the passed trigger.
-         * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
-         */
-
-    }, {
-        key: 'listenClick',
-        value: function listenClick(trigger) {
-            var _this2 = this;
-
-            this.listener = listen_default()(trigger, 'click', function (e) {
-                return _this2.onClick(e);
-            });
+            this.container = clipboard_handlers_typeof(options.container) === 'object' ? options.container : document.body;
         }
 
         /**
@@ -923,8 +911,6 @@ var clipboard_Clipboard = function (_Emitter) {
     }, {
         key: 'destroy',
         value: function destroy() {
-            this.listener.destroy();
-
             if (this.clipboardAction) {
                 this.clipboardAction.destroy();
                 this.clipboardAction = null;
@@ -946,8 +932,62 @@ var clipboard_Clipboard = function (_Emitter) {
         }
     }]);
 
-    return Clipboard;
+    return Clip;
 }(tiny_emitter_default.a);
+
+/**
+ * Base class which takes one or more elements, adds event listeners to them,
+ * and instantiates a new `ClipboardAction` on each click.
+ */
+
+
+var clipboard_handlers_ClipboardListener = function (_Clip) {
+    _inherits(ClipboardListener, _Clip);
+
+    /**
+     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
+     * @param {Object} options
+     */
+    function ClipboardListener(trigger, options) {
+        clipboard_handlers_classCallCheck(this, ClipboardListener);
+
+        var _this2 = _possibleConstructorReturn(this, (ClipboardListener.__proto__ || Object.getPrototypeOf(ClipboardListener)).call(this, options));
+
+        _this2.listenClick(trigger);
+        return _this2;
+    }
+
+    /**
+     * Adds a click event listener to the passed trigger.
+     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
+     */
+
+
+    clipboard_handlers_createClass(ClipboardListener, [{
+        key: 'listenClick',
+        value: function listenClick(trigger) {
+            var _this3 = this;
+
+            this.listener = listen_default()(trigger, 'click', function (e) {
+                return _this3.onClick(e);
+            });
+        }
+
+        /**
+         * Destroy lifecycle.
+         */
+
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.listener.destroy();
+
+            _get(ClipboardListener.prototype.__proto__ || Object.getPrototypeOf(ClipboardListener.prototype), 'destroy', this).call(this);
+        }
+    }]);
+
+    return ClipboardListener;
+}(clipboard_handlers_Clip);
 
 /**
  * Helper function to retrieve attribute value.
@@ -966,7 +1006,12 @@ function getAttributeValue(suffix, element) {
     return element.getAttribute(attribute);
 }
 
-/* harmony default export */ var clipboard = __webpack_exports__["default"] = (clipboard_Clipboard);
+
+// CONCATENATED MODULE: ./src/clipboard.js
+// Shim to ensure that this fork can act as a drop-in replacement for upstream clipboard.js
+
+
+/* harmony default export */ var clipboard = __webpack_exports__["default"] = (clipboard_handlers_ClipboardListener);
 
 /***/ })
 /******/ ])["default"];
