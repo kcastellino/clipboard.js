@@ -3,19 +3,17 @@ import Emitter from 'tiny-emitter';
 import listen from 'good-listener';
 
 /**
- * Base class which takes one or more elements, adds event listeners to them,
- * and instantiates a new `ClipboardAction` on each click.
+ * Base class which provides functions to instantiate a new `ClipboardAction` on each click.
  */
-class Clipboard extends Emitter {
+class Clip extends Emitter {
     /**
      * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
      * @param {Object} options
      */
-    constructor(trigger, options) {
+    constructor(options) {
         super();
 
         this.resolveOptions(options);
-        this.listenClick(trigger);
     }
 
     /**
@@ -28,14 +26,6 @@ class Clipboard extends Emitter {
         this.target    = (typeof options.target    === 'function') ? options.target    : this.defaultTarget;
         this.text      = (typeof options.text      === 'function') ? options.text      : this.defaultText;
         this.container = (typeof options.container === 'object')   ? options.container : document.body;
-    }
-
-    /**
-     * Adds a click event listener to the passed trigger.
-     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
-     */
-    listenClick(trigger) {
-        this.listener = listen(trigger, 'click', (e) => this.onClick(e));
     }
 
     /**
@@ -107,12 +97,43 @@ class Clipboard extends Emitter {
      * Destroy lifecycle.
      */
     destroy() {
-        this.listener.destroy();
-
         if (this.clipboardAction) {
             this.clipboardAction.destroy();
             this.clipboardAction = null;
         }
+    }
+}
+
+/**
+ * Base class which takes one or more elements, adds event listeners to them,
+ * and instantiates a new `ClipboardAction` on each click.
+ */
+class ClipboardListener extends Clip {
+    /**
+     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
+     * @param {Object} options
+     */
+    constructor(trigger, options) {
+        super(options);
+
+        this.listenClick(trigger);
+    }
+
+    /**
+     * Adds a click event listener to the passed trigger.
+     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
+     */
+    listenClick(trigger) {
+        this.listener = listen(trigger, 'click', (e) => this.onClick(e));
+    }
+
+    /**
+     * Destroy lifecycle.
+     */
+    destroy() {
+        this.listener.destroy();
+
+        super.destroy()
     }
 }
 
@@ -132,4 +153,4 @@ function getAttributeValue(suffix, element) {
     return element.getAttribute(attribute);
 }
 
-export default Clipboard;
+export { Clip, ClipboardListener };
