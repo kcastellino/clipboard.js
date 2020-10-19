@@ -3,7 +3,7 @@
 This is a fork of the [original clipboard.js](https://github.com/zenorocha/clipboard.js), written by [Zeno Rocha](https://github.com/zenorocha). This fork currently has two modifications:
 
 1. The main `clipboard.js` file and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js`
-2. A modified version of the `clipboard-action.js` file has been created, implementing copy operations using the **Clipboard API**. By default, this file is not built and bundled (and is located in a different branch of this fork)
+2. A modified version of the `clipboard-action.js` file has been created, implementing copy operations using the **Clipboard API**. This file is located in a different branch of this fork
 
 The reason for these modifications are a) to better integrate with JavaScript frameworks that provide their own event handlers, and b) to support the use of a cleaner and more modern clipboard interface. *Theoretically*, the built file should be a drop-in replacement for the original `clipboard.js`, but it might not be, so test before you commit. [There are more details about these modifications at the bottom of this file.](#modifications)
 
@@ -191,7 +191,7 @@ You can also check if clipboard.js is supported or not by running `ClipboardJS.i
 As explained at the top, this fork modifies the ordinary `clipboard.js` in two ways:
 
 1. The [main clipboard.js file](#refactored-clipboard.js) and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js`
-2. A [modified version of the `clipboard-action.js` file](#modified-clipboard-action.js) has been created, implementing copy operations using the **Clipboard API**. By default, this file is not built and bundled (and is located in a different branch of this fork)
+2. A [modified version of the `clipboard-action.js` file](#modified-clipboard-action.js) has been created, implementing copy operations using the **Clipboard API**. This file is located in a different branch of this fork
 
 The modifications to the `clipboard.js` file are explained below:
 

@@ -13,9 +13,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["ClipboardJS"] = factory();
+		exports["ClipboardHandler"] = factory();
 	else
-		root["ClipboardJS"] = factory();
+		root["ClipboardHandler"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -511,6 +511,10 @@ module.exports = closest;
 "use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "Clip", function() { return /* binding */ clipboard_handler_Clip; });
+__webpack_require__.d(__webpack_exports__, "ClipboardListener", function() { return /* binding */ clipboard_handler_ClipboardListener; });
 
 // EXTERNAL MODULE: ./node_modules/select/src/select.js
 var src_select = __webpack_require__(0);
@@ -1008,11 +1012,6 @@ function getAttributeValue(suffix, element) {
 }
 
 
-// CONCATENATED MODULE: ./src/clipboard.js
-// Shim to ensure that this fork can act as a drop-in replacement for upstream clipboard.js
-
-
-/* harmony default export */ var clipboard = __webpack_exports__["default"] = (clipboard_handler_ClipboardListener);
 
 /***/ })
 /******/ ])["default"];
