@@ -1,11 +1,10 @@
 import ClipboardAction from './clipboard-action';
 import Emitter from 'tiny-emitter';
-import listen from 'good-listener';
 
 /**
  * Base class which provides functions to instantiate a new `ClipboardAction` on each click.
  */
-class Clip extends Emitter {
+class ClipboardHandler extends Emitter {
     /**
      * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
      * @param {Object} options
@@ -104,39 +103,6 @@ class Clip extends Emitter {
     }
 }
 
-/**
- * Base class which takes one or more elements, adds event listeners to them,
- * and instantiates a new `ClipboardAction` on each click.
- */
-class ClipboardListener extends Clip {
-    /**
-     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
-     * @param {Object} options
-     */
-    constructor(trigger, options) {
-        super(options);
-
-        this.listenClick(trigger);
-    }
-
-    /**
-     * Adds a click event listener to the passed trigger.
-     * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
-     */
-    listenClick(trigger) {
-        this.listener = listen(trigger, 'click', (e) => this.onClick(e));
-    }
-
-    /**
-     * Destroy lifecycle.
-     */
-    destroy() {
-        this.listener.destroy();
-
-        super.destroy()
-    }
-}
-
 
 /**
  * Helper function to retrieve attribute value.
@@ -153,4 +119,4 @@ function getAttributeValue(suffix, element) {
     return element.getAttribute(attribute);
 }
 
-export { Clip, ClipboardListener };
+export default ClipboardHandler;
