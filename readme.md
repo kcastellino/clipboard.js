@@ -1,6 +1,14 @@
 # clipboard.js
 
-[![Build Status](http://img.shields.io/travis/zenorocha/clipboard.js/master.svg?style=flat)](https://travis-ci.org/zenorocha/clipboard.js)
+This is a fork of the [original clipboard.js](https://github.com/zenorocha/clipboard.js), written by [Zeno Rocha](https://github.com/zenorocha). This fork currently has two modifications:
+
+1. The main `clipboard.js` file and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js`
+2. A modified version of the `clipboard-action.js` file has been created, implementing copy operations using the **Clipboard API**. By default, this file is not built and bundled (and is located in a different branch of this fork)
+
+The reason for these modifications are a) to better integrate with JavaScript frameworks that provide their own event handlers, and b) to support the use of a cleaner and more modern clipboard interface. *Theoretically*, the built file should be a drop-in replacement for the original `clipboard.js`, but it might not be, so test before you commit. [There are more details about these modifications at the bottom of this file.](#modifications)
+
+***
+
 ![Killing Flash](https://img.shields.io/badge/killing-flash-brightgreen.svg?style=flat)
 
 > Modern copy to clipboard. No Flash. Just 3kb gzipped.
@@ -178,11 +186,31 @@ The good news is that clipboard.js gracefully degrades if you need to support ol
 
 You can also check if clipboard.js is supported or not by running `ClipboardJS.isSupported()`, that way you can hide copy/cut buttons from the UI.
 
-## Bonus
+## Modifications
 
-A browser extension that adds a "copy to clipboard" button to every code block on *GitHub, MDN, Gist, StackOverflow, StackExchange, npm, and even Medium.*
+As explained at the top, this fork modifies the ordinary `clipboard.js` in two ways:
 
-Install for [Chrome](https://chrome.google.com/webstore/detail/codecopy/fkbfebkcoelajmhanocgppanfoojcdmg) and [Firefox](https://addons.mozilla.org/en-US/firefox/addon/codecopy/).
+1. The [main clipboard.js file](#refactored-clipboard.js) and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js`
+2. A [modified version of the `clipboard-action.js` file](#modified-clipboard-action.js) has been created, implementing copy operations using the **Clipboard API**. By default, this file is not built and bundled (and is located in a different branch of this fork)
+
+The modifications to the `clipboard.js` file are explained below:
+
+### Refactored clipboard.js
+
+The original version of clipboard.js exports a single class named `Clipboard`. When a new instance of this class is created (with `new Clipboard(selector)`), the constructor will set up a listener for click events on the selected elements which will then create an instance of the `ClipboardActions` class to add the appropriate text to the clipboard.
+
+In the modified `clipboard-handlers.js` file, the single class has been broken up into two. The first class, currently named `Clip`, takes one optional parameter `options`, which the same object original version, and returns an instantiated object, which contains the necessary functions to trigger a copy or cut operation. If you attach the `onClick` function to an event handler, it will operate exactly the same as the original. Keep in mind that browsers only permit clipboard access to be initiated by the user, so the triggering event cannot be synthetic, and instead must be a native event like `onclick`.
+
+The second class is named `ClipboardListener`, and extends the `Clip` class. The class constructor requires a mandatory parameter `trigger`, in addition to the optional parameter `options`. The class contains functions to add and remove the appropriate event listeners. This class *should* work identically to the original `Clipboard` class exported by `clipboard.js`.
+
+For compatibility with the original `clipboard.js`, there is also a `clipboard.js` file that imports the `ClipboardListener` class as `Clipboard` and exports that class as the default. This file is used as the root for builds of this project, and *should* allow for the resulting bundle to be used as a drop-in replacement for the original `clipboard.js`
+
+### Roadmap
+
+- [ ] Further modify `clipboard-actions.js` to use the Clipboard API without the Selection API
+- [ ] Look at providing further access to the internals of the `Clipboard` classes
+
+If anybody has ideas for further functionality, don't hesitate to create an issue.
 
 ## License
 
