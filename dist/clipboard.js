@@ -3,6 +3,9 @@
  * https://clipboardjs.com/
  * 
  * Licensed MIT © Zeno Rocha
+ * 
+ * This version modified by Kiran Castellino
+ * See more: https://github.com/kcastellino/clipboard.js
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -506,6 +509,7 @@ module.exports = closest;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/select/src/select.js

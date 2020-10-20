@@ -8,7 +8,10 @@ const production = process.env.NODE_ENV === 'production' || false;
 const banner = `clipboard.js v${pkg.version}
 https://clipboardjs.com/
 
-Licensed MIT © Zeno Rocha`;
+Licensed MIT © Zeno Rocha
+
+This version modified by Kiran Castellino
+See more: https://github.com/kcastellino/clipboard.js`;
 
 module.exports = {
     entry: './src/clipboard.js',
