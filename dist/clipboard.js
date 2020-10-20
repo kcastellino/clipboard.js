@@ -571,20 +571,7 @@ var clipboard_action_ClipboardAction = function () {
         key: 'initSelection',
         value: function initSelection() {
             if (this.text) {
-                /*  Check for existence of JavaScript Clipboard API
-                    (supported in Chrome 66, Edge 79, Firefox 63,
-                    Opera 53, Safari 13.1 and later).
-                    Requires secure connection, and not supported in IE.
-                */
-                if ("clipboard" in navigator) {
-                    navigator.clipboard.writeText(this.text).then(function () {
-                        this.handleResult(true);
-                    }, function () {
-                        this.selectFake();
-                    });
-                } else {
-                    this.selectFake();
-                }
+                this.clipboardAPICaller(this.text, this.selectFake);
             } else if (this.target) {
                 this.selectTarget();
             }
@@ -662,18 +649,7 @@ var clipboard_action_ClipboardAction = function () {
             var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.target;
 
             this.selectedText = select_default()(el);
-            if ("clipboard" in navigator) {
-                navigator.clipboard.writeText(this.selectedText).then(function () {
-                    if (this.action === 'cut') {
-                        document.execCommand('delete');
-                    };
-                    this.handleResult(true);
-                }, function () {
-                    this.copyText();
-                });
-            } else {
-                this.copyText();
-            }
+            this.clipboardAPICaller(this.selectedText, this.copyText);
         }
 
         /**
@@ -692,6 +668,41 @@ var clipboard_action_ClipboardAction = function () {
             }
 
             this.handleResult(succeeded);
+        }
+
+        /**
+         * Checks if Clipboard API is available and uses it, otherwise falls back to alternate function
+         * @param {*} text Text to copy
+         * @param {*} alternateFn Fallback function if Clipboard API is unavailable
+         */
+
+    }, {
+        key: 'clipboardAPICaller',
+        value: function clipboardAPICaller(text, alternateFn) {
+            /*  Check for existence of JavaScript Clipboard API
+                (supported in Chrome 66, Edge 79, Firefox 63,
+                Opera 53, Safari 13.1 and later).
+                Requires secure connection, may require user permission,
+                and not supported in IE.
+            */
+            if ("clipboard" in navigator) {
+                navigator.clipboard.writeText(text).then(this.clipboardAPISuccess, alternateFn);
+            } else {
+                alternateFn();
+            }
+        }
+
+        /**
+         * Called when the Clipboard API succeeds at adding text to the clipboard
+         */
+
+    }, {
+        key: 'clipboardAPISuccess',
+        value: function clipboardAPISuccess() {
+            if (this.action === 'cut') {
+                document.execCommand('delete');
+            };
+            this.handleResult(true);
         }
 
         /**
