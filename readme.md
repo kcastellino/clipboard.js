@@ -1,6 +1,14 @@
 # clipboard.js
 
-[![Build Status](http://img.shields.io/travis/zenorocha/clipboard.js/master.svg?style=flat)](https://travis-ci.org/zenorocha/clipboard.js)
+This is a fork of the [original clipboard.js](https://github.com/zenorocha/clipboard.js), written by [Zeno Rocha](https://github.com/zenorocha). This fork currently has two modifications:
+
+1. The main `clipboard.js` file and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js` (in a different branch)
+2. A modified version of the `clipboard-action.js` file has been created, implementing copy operations using the **Clipboard API**. By default, this file is built and bundled on this branch only
+
+The reason for these modifications are a) to better integrate with JavaScript frameworks that provide their own event handlers, and b) to support the use of a cleaner and more modern clipboard interface. *Theoretically*, the built file should be a drop-in replacement for the original `clipboard.js`, but it might not be, so test before you commit. [There are more details about these modifications at the bottom of this file.](#modifications)
+
+***
+
 ![Killing Flash](https://img.shields.io/badge/killing-flash-brightgreen.svg?style=flat)
 
 > Modern copy to clipboard. No Flash. Just 3kb gzipped.
@@ -178,11 +186,27 @@ The good news is that clipboard.js gracefully degrades if you need to support ol
 
 You can also check if clipboard.js is supported or not by running `ClipboardJS.isSupported()`, that way you can hide copy/cut buttons from the UI.
 
-## Bonus
+## Modifications
 
-A browser extension that adds a "copy to clipboard" button to every code block on *GitHub, MDN, Gist, StackOverflow, StackExchange, npm, and even Medium.*
+As explained at the top, this fork modifies the ordinary `clipboard.js` in two ways:
 
-Install for [Chrome](https://chrome.google.com/webstore/detail/codecopy/fkbfebkcoelajmhanocgppanfoojcdmg) and [Firefox](https://addons.mozilla.org/en-US/firefox/addon/codecopy/).
+1. The [main clipboard.js file](#refactored-clipboard.js) and class has been refactored and abstracted to separate the code for handling clipboard operations from the code creating event listeners. The modified classes are in `clipboard-handlers.js` (in a different branch)
+2. A [modified version of the `clipboard-action.js` file](#modified-clipboard-action.js) has been created, implementing copy operations using the **Clipboard API**. By default, this file is built and bundled on this branch only
+
+The modifications to `clipboard-action.js` are explained here:
+
+### Modified clipboard-action.js
+
+This project includes a modified copy of `clipboard-action.js`, which uses the **Clipboard API**, falling back to the existing `document.execCommand` method. The Clipboard API provides a concise method of adding text to the clipboard, and is available in all modern browsers. The tradeoff is that it can only be used on sites with TLS, and some browsers place the API behind a user permission. Additionally, because the current version doesn't radically change the flow of the `ClipboardAction` class, it still relies on the Selection API (indeed, it will probably continue to do so until all target browsers implement HTMLElement.innerText in a consistent manner). While this API is currently supported, it's certainly not the most efficient way to grab text from an element. Finally, the Clipboard API does not have the concept of `cut`, so that action is currently performed by passing the selected text into the API, and then calling `document.execCommand('delete')`.
+
+Currently, the modified file is being built by Webpack **on this branch only**. The built files are in the `/dist` folder.
+
+### Roadmap
+
+- [ ] Further modify `clipboard-actions.js` to use the Clipboard API without the Selection API (on the backburner until old browsers with old HTMLElement.innerText implementations are retired)
+- [ ] Look at providing further access to the internals of the `Clipboard` classes
+
+If anybody has ideas for further functionality, don't hesitate to create an issue.
 
 ## License
 

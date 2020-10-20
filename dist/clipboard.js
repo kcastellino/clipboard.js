@@ -1,5 +1,5 @@
 /*!
- * clipboard.js v2.0.6
+ * clipboard.js v2.0.6-alpha.3
  * https://clipboardjs.com/
  * 
  * Licensed MIT © Zeno Rocha
@@ -571,7 +571,20 @@ var clipboard_action_ClipboardAction = function () {
         key: 'initSelection',
         value: function initSelection() {
             if (this.text) {
-                this.selectFake();
+                /*  Check for existence of JavaScript Clipboard API
+                    (supported in Chrome 66, Edge 79, Firefox 63,
+                    Opera 53, Safari 13.1 and later).
+                    Requires secure connection, and not supported in IE.
+                */
+                if ("clipboard" in navigator) {
+                    navigator.clipboard.writeText(this.text).then(function () {
+                        this.handleResult(true);
+                    }, function () {
+                        this.selectFake();
+                    });
+                } else {
+                    this.selectFake();
+                }
             } else if (this.target) {
                 this.selectTarget();
             }
@@ -615,8 +628,7 @@ var clipboard_action_ClipboardAction = function () {
 
             this.container.appendChild(this.fakeElem);
 
-            this.selectedText = select_default()(this.fakeElem);
-            this.copyText();
+            this.selectTarget(this.fakeElem);
         }
 
         /**
@@ -641,13 +653,27 @@ var clipboard_action_ClipboardAction = function () {
 
         /**
          * Selects the content from element passed on `target` property.
+         * @param {Element} [el=this.target] HTML element to retrieve text value from
          */
 
     }, {
         key: 'selectTarget',
         value: function selectTarget() {
-            this.selectedText = select_default()(this.target);
-            this.copyText();
+            var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.target;
+
+            this.selectedText = select_default()(el);
+            if ("clipboard" in navigator) {
+                navigator.clipboard.writeText(this.selectedText).then(function () {
+                    if (this.action === 'cut') {
+                        document.execCommand('delete');
+                    };
+                    this.handleResult(true);
+                }, function () {
+                    this.copyText();
+                });
+            } else {
+                this.copyText();
+            }
         }
 
         /**
